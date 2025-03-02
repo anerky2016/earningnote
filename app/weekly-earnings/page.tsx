@@ -1,3 +1,5 @@
+'use client';
+
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { WeekCalendar } from "@/components/week-calendar"
@@ -68,4 +70,3 @@ export default async function WeeklyEarningsPage({
     </div>
   )
 }
-

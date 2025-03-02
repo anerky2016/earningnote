@@ -18,6 +18,7 @@ interface EarningsSummary {
 
 export interface EarningsData {
   symbol: string
+  rating?: "Buy" | "Hold" | "Sell"
   companyName: string
   domain: string
   reportDate: string
@@ -477,4 +478,3 @@ export async function getWeeklyEarnings(): Promise<EarningsData[]> {
   await new Promise((resolve) => setTimeout(resolve, 500))
   return generateMockWeeklyEarnings()
 }
-

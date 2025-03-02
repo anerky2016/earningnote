@@ -14,7 +14,7 @@ interface EarningsData {
   epsEstimate: number
   revenue: number | null
   revenueEstimate: number
-  rating: "Buy" | "Hold" | "Sell"
+  rating?: "Buy" | "Hold" | "Sell"
   currentPrice: number
   projectedPrice: number
 }
@@ -57,7 +57,7 @@ export function EarningReportTile({ data }: EarningReportTileProps) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Rating</p>
-              <p className="text-lg sm:text-xl font-bold">{data.rating}</p>
+              <p className="text-lg sm:text-xl font-bold">{data.rating || "Hold"}</p>
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">Price</p>
@@ -85,4 +85,3 @@ export function EarningReportTile({ data }: EarningReportTileProps) {
     </Card>
   )
 }
-
