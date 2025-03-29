@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { ArrowDown, ArrowUp } from "lucide-react"
 import type { IntradayDataPoint } from "@/lib/mockChartData"
-import { createChart, LineSeries } from "lightweight-charts"
+import { createChart, BarSeries } from "lightweight-charts"
 
 interface IntradayChartProps {
   data: IntradayDataPoint[]
@@ -83,11 +83,29 @@ export function IntradayChart({ data, symbol, title }: IntradayChartProps) {
       },
     }
 
-    // Add series using addSeries method with type assertion to bypass TypeScript errors
-    const series = (chart as any).addSeries(LineSeries)
+    // Add bar series with minimal supported configuration
+    const series = chart.addSeries<"Bar">(BarSeries, {
+      upColor: 'rgb(34, 197, 94)',
+      downColor: 'rgb(239, 68, 68)',
+      priceFormat: {
+        type: 'price',
+        precision: 2,
+        minMove: 0.01,
+      },
+    })
 
-    // Set data using setData method
-    series.setData(formattedData)
+    // Set data - convert time to string format expected by lightweight-charts
+    series.setData(formattedData.map(point => {
+      const date = new Date(point.time)
+      const timeStr = date.toISOString().split('T')[0] // YYYY-MM-DD format
+      return {
+        time: timeStr,
+        open: point.value,
+        high: point.value,
+        low: point.value,
+        close: point.value
+      }
+    }))
 
     // Fit content
     chart.timeScale().fitContent()
