@@ -2,7 +2,8 @@
 
 import Link from "next/link"
 import { useState, Suspense } from "react"
-import { Search, Menu } from "lucide-react"
+import { Search, Menu, LogIn, LogOut } from "lucide-react"
+import { useSession, signIn, signOut } from "next-auth/react"
 import { Input } from "@/components/ui/input"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
@@ -41,6 +42,7 @@ function HeaderInner() {
           </form>
           <div className="flex items-center space-x-4">
             <ThemeToggle />
+            <AuthButton />
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon" className="md:hidden">
@@ -56,6 +58,7 @@ function HeaderInner() {
                   <Link href="/weekly-earnings" className="text-lg font-medium hover:text-primary transition-colors">
                     Weekly Earnings
                   </Link>
+                  <AuthButtonMobile />
                   <form action={searchStock} className="flex flex-col space-y-2">
                     <Input
                       type="text"
@@ -78,6 +81,64 @@ function HeaderInner() {
   )
 }
 
+function AuthButton() {
+  const { data: session } = useSession()
+
+  if (session) {
+    return (
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => signOut()}
+        className="hidden md:flex items-center gap-2"
+      >
+        <LogOut className="h-4 w-4" />
+        Sign Out
+      </Button>
+    )
+  }
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={() => signIn("google")}
+      className="hidden md:flex items-center gap-2"
+    >
+      <LogIn className="h-4 w-4" />
+      Sign In
+    </Button>
+  )
+}
+
+function AuthButtonMobile() {
+  const { data: session } = useSession()
+
+  if (session) {
+    return (
+      <Button
+        variant="ghost"
+        className="w-full justify-start"
+        onClick={() => signOut()}
+      >
+        <LogOut className="h-4 w-4 mr-2" />
+        Sign Out
+      </Button>
+    )
+  }
+
+  return (
+    <Button
+      variant="ghost"
+      className="w-full justify-start"
+      onClick={() => signIn("google")}
+    >
+      <LogIn className="h-4 w-4 mr-2" />
+      Sign In
+    </Button>
+  )
+}
+
 export function Header() {
   return (
     <Suspense fallback={null}>
@@ -85,4 +146,3 @@ export function Header() {
     </Suspense>
   )
 }
-
