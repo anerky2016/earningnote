@@ -87,10 +87,9 @@ function AuthButton() {
   if (session) {
     return (
       <Button
-        variant="ghost"
-        size="sm"
+        variant="outline"
         onClick={() => signOut()}
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 bg-secondary"
       >
         <LogOut className="h-4 w-4" />
         Sign Out
@@ -100,10 +99,9 @@ function AuthButton() {
 
   return (
     <Button
-      variant="ghost"
-      size="sm"
-      onClick={() => signIn("google")}
-        className="flex items-center gap-2"
+        variant="outline"
+        onClick={() => signIn("google")}
+        className="flex items-center gap-2 bg-secondary"
     >
       <LogIn className="h-4 w-4" />
       Sign In
