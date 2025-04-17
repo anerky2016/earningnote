@@ -90,7 +90,7 @@ function AuthButton() {
         variant="ghost"
         size="sm"
         onClick={() => signOut()}
-        className="hidden md:flex items-center gap-2"
+        className="flex items-center gap-2"
       >
         <LogOut className="h-4 w-4" />
         Sign Out
@@ -103,7 +103,7 @@ function AuthButton() {
       variant="ghost"
       size="sm"
       onClick={() => signIn("google")}
-      className="hidden md:flex items-center gap-2"
+        className="flex items-center gap-2"
     >
       <LogIn className="h-4 w-4" />
       Sign In
