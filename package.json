@@ -8,8 +8,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start -p 8080",
-    "postinstall": "NPM_CONFIG_LOGLEVEL=verbose npm install --verbose && next build",
+    "start": "next start -p ${PORT:-3000}",
+    "postinstall": "next build",
     "lint": "next lint"
   },
   "dependencies": {
