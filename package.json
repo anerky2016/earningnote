@@ -8,8 +8,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "sh ./start.sh",
+    "lint": "eslint .",
+    "azure-build": "npm install && npm run build && npm run start"
   },
   "dependencies": {
     "@auth/core": "latest",
