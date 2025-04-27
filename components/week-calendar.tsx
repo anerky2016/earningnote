@@ -12,8 +12,14 @@ interface WeekCalendarProps {
 }
 
 export function WeekCalendar({ onDateSelect, linkToWeekly = false }: WeekCalendarProps) {
-  const [currentDate, setCurrentDate] = useState(new Date())
-  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [currentDate, setCurrentDate] = useState(() => {
+    const now = new Date()
+    return new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+  })
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const now = new Date()
+    return new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+  })
   const router = useRouter()
 
   useEffect(() => {
@@ -53,7 +59,7 @@ export function WeekCalendar({ onDateSelect, linkToWeekly = false }: WeekCalenda
       onDateSelect(date)
     }
     if (linkToWeekly) {
-      router.push(`/weekly-earnings?date=${date.toISOString().split("T")[0]}`)
+      router.push(`/weekly-earnings?date=${date.toLocaleDateString('en-CA')}`)
     }
   }
 
@@ -67,7 +73,12 @@ export function WeekCalendar({ onDateSelect, linkToWeekly = false }: WeekCalenda
           <div className="text-center">
             <h2 className="text-2xl font-bold">{`${currentMonth} ${currentYear}`}</h2>
             <p className="text-sm text-muted-foreground">
-              {currentDate.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
+              {currentDate.toLocaleDateString(undefined, { 
+                weekday: "long", 
+                month: "long", 
+                day: "numeric",
+                timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone 
+              })}
             </p>
           </div>
           <Button variant="ghost" size="icon" onClick={() => navigateWeek("next")}>
@@ -108,4 +119,3 @@ export function WeekCalendar({ onDateSelect, linkToWeekly = false }: WeekCalenda
     </Card>
   )
 }
-

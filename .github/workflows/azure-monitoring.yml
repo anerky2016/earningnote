@@ -1,0 +1,28 @@
+name: Azure Monitoring Configuration
+on:
+  workflow_run:
+    workflows: ["Azure Container Deployment"]
+    types:
+      - completed
+
+jobs:
+  configure-monitoring:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure Application Insights
+        uses: azure/cli@v1
+        with:
+          inlineScript: |
+            az monitor app-insights component create \
+              --app earningnote-insights \
+              --location eastus \
+              --resource-group \${{ env.AZURE_RESOURCE_GROUP }} \
+              --application-type web
+            
+            az webapp config appsettings set \
+              --name \${{ env.AZURE_WEBAPP_NAME }} \
+              --resource-group \${{ env.AZURE_RESOURCE_GROUP }} \
+              --settings \
+                APPINSIGHTS_INSTRUMENTATIONKEY=\${{ secrets.APPINSIGHTS_KEY }} \
+                APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=\${{ secrets.APPINSIGHTS_KEY }} \
+                ApplicationInsightsAgent_EXTENSION_VERSION=~3

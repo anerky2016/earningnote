@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NVIDIA Financial Flow</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+      body {
+          background: #ffffff;
+          color: #1a1a1a;
+          font-family: 'Inter', sans-serif;
+          margin: 0;
+          padding: 2rem;
+      }
+      .container {
+          max-width: 1400px;
+          margin: 0 auto;
+          background: #ffffff;
+          border-radius: 1rem;
+          padding: 2rem;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .chart-header {
+          text-align: center;
+          margin-bottom: 2rem;
+      }
+      .chart-title {
+          font-size: 2rem;
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+          background: linear-gradient(45deg, #4CAF50, #D32F2F);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+      }
+      .legend {
+          display: flex;
+          gap: 2rem;
+          justify-content: center;
+          margin-top: 2rem;
+      }
+      .legend-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+      }
+      .color-box {
+          width: 20px;
+          height: 20px;
+          border-radius: 4px;
+      }
+  </style>
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['sankey']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            const data = new google.visualization.DataTable();
+            data.addColumn('string', 'Source');
+            data.addColumn('string', 'Destination');
+            data.addColumn('number', 'Value');
+            data.addColumn({type: 'string', role: 'tooltip'});
+            data.addColumn({type: 'string', role: 'style'});
+            
+             // Revenue Streams (Green)
+             data.addRows([
+                ['Data Center', 'Total Revenue', 30800, '$30.8B (88%)', '#4CAF50'],
+                ['Gaming', 'Total Revenue', 3300, '$3.3B (9.4%)', '#4CAF50'],
+                ['Professional Vis.', 'Total Revenue', 486, '$486M (1.4%)', '#4CAF50'],
+                ['Automotive', 'Total Revenue', 449, '$449M (1.3%)', '#4CAF50'],
+                ['Other', 'Total Revenue', 47, '$47M (0.13%)', '#4CAF50'],
+                
+                // Expenses & Costs (Red)
+                ['Total Revenue', 'Cost of Revenue', 8926, 'COGS: $8.9B', '#D32F2F'],
+                ['Total Revenue', 'Gross Profit', 26156, 'Gross Profit: $26.2B', '#4CAF50'],
+                ['Gross Profit', 'Operating Expenses', 4287, 'OpEx: $4.3B', '#D32F2F'],
+                ['Gross Profit', 'Operating Income', 21869, 'OpIncome: $21.9B', '#4CAF50'],
+                ['Operating Income', 'Taxes', 3007, 'Taxes: $3.0B', '#D32F2F'],
+                ['Operating Income', 'Net Income', 19309, 'Net Income: $19.3B', '#4CAF50']
+            ]);
+
+            const options = {
+                width: 1400,
+                height: 800,
+                sankey: {
+                    node: {
+                        label: { 
+                            fontName: 'Inter',
+                            fontSize: 14,
+                            color: '#1a1a1a',
+                            bold: true
+                        },
+                        width: 40,
+                        nodePadding: 30,
+                        colors: ['#2d3436']
+                    },
+                    link: {
+                        colorMode: 'none',
+                        color: {
+                            fillOpacity: 0.8
+                        }
+                    }
+                },
+                tooltip: {
+                    textStyle: {
+                        fontName: 'Inter',
+                        fontSize: 14,
+                        color: '#1a1a1a'
+                    }
+                }
+            };
+
+            var chart = new google.visualization.Sankey(document.getElementById('chart_div'));
+            chart.draw(data, options);
+        }
+    </script>
+</head>
+<body>
+    <div class="header">
+        <h2>NVIDIA Q3 FY2025 Financial Flow ($ Billions)</h2>
+        <p style="color: #666;">Green = Income/Profit | Red = Costs/Expenses</p>
+    </div>
+    <div id="chart_div"></div>
+    
+    <div style="text-align: center; margin-top: 20px; color: #666;">
+        <p>Key Financial Ratios:</p>
+        <ul style="list-style: none; padding: 0;">
+            <li>✔️ Gross Margin: 74.6%</li>
+            <li>✔️ Operating Margin: 62.3%</li>
+            <li>✔️ Net Margin: 55.0%</li>
+        </ul>
+    </div>
+</body>
+</html>

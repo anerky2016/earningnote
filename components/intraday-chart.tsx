@@ -1,9 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { ArrowDown, ArrowUp } from "lucide-react"
 import type { IntradayDataPoint } from "@/lib/mockChartData"
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
+import { createChart, LineSeries } from "lightweight-charts"
 
 interface IntradayChartProps {
   data: IntradayDataPoint[]
@@ -12,11 +12,8 @@ interface IntradayChartProps {
 }
 
 export function IntradayChart({ data, symbol, title }: IntradayChartProps) {
-  const [chartData, setChartData] = useState<IntradayDataPoint[]>([])
-
-  useEffect(() => {
-    setChartData(data)
-  }, [data])
+  const chartContainerRef = useRef<HTMLDivElement>(null)
+  const resizeObserverRef = useRef<ResizeObserver | null>(null)
 
   const startPrice = data[0].price
   const endPrice = data[data.length - 1].price
@@ -25,10 +22,97 @@ export function IntradayChart({ data, symbol, title }: IntradayChartProps) {
 
   const isPositive = priceChange >= 0
 
-  const formatXAxis = (time: string) => {
-    const date = new Date(time)
-    return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, "0")}`
-  }
+  useEffect(() => {
+    if (!chartContainerRef.current) return
+
+    // Clean up previous chart elements
+    while (chartContainerRef.current.firstChild) {
+      chartContainerRef.current.removeChild(chartContainerRef.current.firstChild)
+    }
+
+    // Clean up previous resize observer if it exists
+    if (resizeObserverRef.current) {
+      resizeObserverRef.current.disconnect()
+      resizeObserverRef.current = null
+    }
+
+    // Get theme colors from CSS variables
+    const computedStyle = getComputedStyle(document.documentElement)
+    const backgroundColor = computedStyle.getPropertyValue('--background') || '#ffffff'
+    const textColor = computedStyle.getPropertyValue('--foreground') || '#1e293b'
+    const gridColor = computedStyle.getPropertyValue('--border') || '#e2e8f0'
+
+    // Create chart
+    const chart = createChart(chartContainerRef.current, {
+      layout: {
+        background: { color: backgroundColor },
+        textColor: textColor,
+      },
+      grid: {
+        vertLines: { color: gridColor, style: 1 }, // 1 = dotted
+        horzLines: { color: gridColor, style: 1 }, // 1 = dotted
+      },
+      width: chartContainerRef.current.clientWidth,
+      height: 300,
+      timeScale: {
+        timeVisible: true,
+        secondsVisible: false,
+      },
+    })
+
+    // Format data for lightweight-charts
+    const formattedData = data.map(point => {
+      // Convert date to epoch time (milliseconds since January 1, 1970)
+      const date = new Date(point.time)
+      const epochTime = date.getTime()
+      
+      return {
+        time: epochTime,
+        value: point.price
+      }
+    })
+
+    // Create series options
+    const seriesOptions = {
+      color: isPositive ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)',
+      lineWidth: 2,
+      priceFormat: {
+        type: 'price',
+        precision: 2,
+        minMove: 0.01,
+      },
+    }
+
+    // Add series using addSeries method with type assertion to bypass TypeScript errors
+    const series = (chart as any).addSeries(LineSeries)
+
+    // Set data using setData method
+    series.setData(formattedData)
+
+    // Fit content
+    chart.timeScale().fitContent()
+
+    // Handle resize
+    const resizeObserver = new ResizeObserver(entries => {
+      if (entries.length > 0) {
+        const { width } = entries[0].contentRect
+        chart.applyOptions({ width })
+        chart.timeScale().fitContent()
+      }
+    })
+
+    resizeObserver.observe(chartContainerRef.current)
+    resizeObserverRef.current = resizeObserver
+
+    // Cleanup
+    return () => {
+      chart.remove()
+      if (resizeObserverRef.current) {
+        resizeObserverRef.current.disconnect()
+        resizeObserverRef.current = null
+      }
+    }
+  }, [data, isPositive])
 
   return (
     <div>
@@ -42,32 +126,7 @@ export function IntradayChart({ data, symbol, title }: IntradayChartProps) {
           </span>
         </div>
       </div>
-      <div className="h-[300px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={chartData}>
-            <defs>
-              <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <XAxis dataKey="time" tickFormatter={formatXAxis} interval="preserveStartEnd" />
-            <YAxis domain={["auto", "auto"]} tickFormatter={(value) => `$${value.toFixed(2)}`} />
-            <Tooltip
-              labelFormatter={(label) => new Date(label).toLocaleString()}
-              formatter={(value: number) => [`$${value.toFixed(2)}`, "Price"]}
-            />
-            <Area
-              type="monotone"
-              dataKey="price"
-              stroke="hsl(var(--primary))"
-              fillOpacity={1}
-              fill="url(#colorPrice)"
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
+      <div ref={chartContainerRef} className="h-[300px] w-full" />
     </div>
   )
 }
-
